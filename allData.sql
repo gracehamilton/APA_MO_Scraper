@@ -1,1 +1,2 @@
+/*import data*/
 \COPY alldata(petfinder_id, primary_breed, secondary_breed, mixed, age, gender, dog_size, dog_name, description, apa_id, url, photo, created_at, last_modified) FROM 'C:/Users/gbham/gracehamilton.io/dogData.csv' DELIMITER ';' CSV HEADER;

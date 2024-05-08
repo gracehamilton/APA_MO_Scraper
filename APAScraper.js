@@ -5,6 +5,12 @@ const id = "y1ojzoyO7TvfNHyXfWDZAX9rL1GUIrgbGOnqPvtzAs3FoC0S0O";
 const secret = "rjK77I88buUdQmqhZ4tcc1HMOevOKgP7NdNM49Hf";
 const override = argv[2]
 
+class photos {
+    constructor(links){
+        if (links.length > 0){
+            this.full = links[0].full;}
+    }
+}
 class dog {
     constructor(animal){
         this.petfinder_id = animal.id;
@@ -15,13 +21,13 @@ class dog {
         this.gender = animal.gender;
         this.size = animal.size;
         this.name = animal.name;
-        this.desc = "\"\"" + animal.description + "\"\"";
+        this.desc = String(animal.description).replaceAll('&amp;#39;', "\'");
         this.apa_id = animal.organization_animal_id;
         this.url = "https://apamo.org/adopt/adoptable-pets/?petID=" + this.apa_id;
-        this.photo = animal.photos.full;
+        this.photo = (new photos(animal.photos)).full;
         this.created_datetime = animal.published_at;
         this.lastmod_datetime = animal.status_changed_at;
-        this.status = animal.status;
+        //this.status = animal.status;
         }
 }
 
@@ -44,7 +50,7 @@ async function buildDB(){
         method: 'GET',
         headers: {'Authorization': 'Bearer ' + token}
     };
-    let dogs = [["Petfinder ID", "Primary Breed", "Secondary Breed", "Mixed?", "Age", "Gender", "Size", "Name", "Description", "APA ID", "URL", "Photo", "Created at", "Last Modified", "Status"]];
+    let dogs = [];
     earliest = await fetch('https://api.petfinder.com/v2/animals/?type=dog&status=adoptable&organization=MO228&limit=100&sort=recent', options)
     .then((response) => response.json())
     .then((body) => {
@@ -55,7 +61,6 @@ async function buildDB(){
                 ids.push(animal.organization_animal_id);
             }
         });});
-        //dogs needs to be converted to bytes/intarray
     latest = await fetch("https://api.petfinder.com/v2/animals/?type=dog&status=adoptable&organization=MO228&limit=100&sort=-recent", options)
     .then((response) => response.json())
     .then((body) => {
@@ -68,9 +73,9 @@ async function buildDB(){
         });});
     var file = fs.createWriteStream('dogData.csv');
     file.on('error', function(err) {console.log(err)});
-    dogs.forEach(function(v) { file.write(v.join(', ') + '\n'); });
+    file.write("sep=;" + '\n');
+    dogs.forEach(function(v) { file.write(v.join(';') + '\n'); });
     file.end();
-    //dogs_buffer = new ArrayBuffer[dogs];
     //fs.writeFile("fstest.csv", dogs_buffer, (err) => {if (err) throw err;})
     const count = ids.length;
     if (count < 200 && override != "override"){
@@ -78,6 +83,5 @@ async function buildDB(){
     } else {
         console.log("Capacity reached! See dogData.csv")
         }
-    
 }
 buildDB();
