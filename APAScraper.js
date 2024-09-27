@@ -13,7 +13,6 @@ class photos {
 }
 class dog {
     constructor(animal){
-        this.petfinder_id = animal.id;
         this.breed1 = animal.breeds.primary;
         this.breed2 = animal.breeds.secondary;
         this.mixed = animal.breeds.mixed;
@@ -51,12 +50,14 @@ async function buildDB(){
         headers: {'Authorization': 'Bearer ' + token}
     };
     let dogs = [];
+    let k9arr= [];
     earliest = await fetch('https://api.petfinder.com/v2/animals/?type=dog&status=adoptable&organization=MO228&limit=100&sort=recent', options)
     .then((response) => response.json())
     .then((body) => {
         body.animals.forEach(animal=> {
             if(animal.species.toLowerCase() == "dog"){
                 k9 = new dog(animal);
+                k9arr.push(k9);
                 dogs.push(Object.values(k9));
                 ids.push(animal.organization_animal_id);
             }
@@ -67,6 +68,7 @@ async function buildDB(){
         body.animals.forEach(animal=> {
             if(animal.species.toLowerCase() == "dog" && !ids.includes(animal.organization_animal_id)){
                 k9 = new dog(animal);
+                k9arr.push(k9);
                 dogs.push(Object.values(k9));
                 ids.push(animal.organization_animal_id);
             }
@@ -74,7 +76,7 @@ async function buildDB(){
     var file = fs.createWriteStream('dogData.csv');
     file.on('error', function(err) {console.log(err)});
     file.write("sep=;" + '\n');
-    dogs.forEach(function(v) { file.write(v.join(';') + '\n'); });
+    dogs.forEach(function(v) {file.write(v.join(';') + '\n');});
     file.end();
     //fs.writeFile("fstest.csv", dogs_buffer, (err) => {if (err) throw err;})
     const count = ids.length;
@@ -83,5 +85,24 @@ async function buildDB(){
     } else {
         console.log("Capacity reached! See dogData.csv")
         }
+    return k9arr
 }
-buildDB();
+async function atRisk(dogs){
+    riskList = dogs.filter((dog) => ((dog.age == "Adult"||dog.age == "Senior") && (dog.size == "Large"||dog.size == "Medium")));
+    let riskArr = [];
+    riskList.forEach(function(v){riskArr.push(Object.values(v));});
+    var file = fs.createWriteStream('atRisk.csv');
+    file.on('error', function(err) {console.log(err)});
+    //file.write("sep=;" + '\n');
+    try{
+    riskArr.forEach(function(v) {file.write(v.join(';') + '\n');});
+    file.end();}
+    catch(error){
+        console.log(error);
+    }
+}
+async function main(){
+    dogs = await buildDB();
+    atRisk(dogs);
+}
+main()
