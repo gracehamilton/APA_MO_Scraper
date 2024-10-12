@@ -1,8 +1,6 @@
 var https = require("https");
 const fs = require("fs");
 const argv = require("node:process");
-const id = "y1ojzoyO7TvfNHyXfWDZAX9rL1GUIrgbGOnqPvtzAs3FoC0S0O";
-const secret = "rjK77I88buUdQmqhZ4tcc1HMOevOKgP7NdNM49Hf";
 const override = argv[2]
 
 class photos {
