@@ -32,23 +32,25 @@ def getDataFrame(index):
                 if prop == "Brought_to_the_shelter":
                     val = datetime.date.fromisoformat(val.replace(".", "-"))
                 elif prop == "Age":
-                    years = 0 if len(re.findall(r'[0-9]+ years', val)) == 0 else int(re.findall(r'[0-9]+',re.findall(r'[0-9]+ years', val)[0])[0])
-                    months = 0 if len(re.findall(r'[0-9]+ months', val)) == 0 else int(re.findall(r'[0-9]+',re.findall(r'[0-9]+ months', val)[0])[0])
-                    weeks = 0 if len(re.findall(r'[0-9]+ weeks', val)) == 0 else int(re.findall(r'[0-9]+',re.findall(r'[0-9]+ weeks', val)[0])[0])
+                    years = 0 if len(re.findall(r'[0-9]+ year[s]?', val)) == 0 else int(re.findall(r'[0-9]+',re.findall(r'[0-9]+ year[s]?', val)[0])[0])
+                    months = 0 if len(re.findall(r'[0-9]+ month[s]?', val)) == 0 else int(re.findall(r'[0-9]+',re.findall(r'[0-9]+ month[s]?', val)[0])[0])
+                    weeks = 0 if len(re.findall(r'[0-9]+ week[s]?', val)) == 0 else int(re.findall(r'[0-9]+',re.findall(r'[0-9]+ week[s]?', val)[0])[0])
                     forDF['Age_in_months'] = int(years*12 + months + int(weeks/4))
                 forDF[prop]=val
-            forDF['Description'], weight = getDescriptionandWeight(forDF["Animal_id"], forDF["shelterCode"])
-            forDF['Weight'] = 0.0 if len(weight) == 0 else float(re.search(r'[0-9]*\.[0-9]*', weight[0]).group(0))
+            #forDF['Description'], weight = getDescriptionandWeight(forDF["Animal_id"], forDF["shelterCode"])
+            #forDF['Weight'] = 0.0 if len(weight) == 0 else float(re.search(r'[0-9]*\.[0-9]*', weight[0]).group(0))
             dogsParsed.append(forDF)
         dogDF = pd.DataFrame(dogsParsed)
         index += 1
         return dogDF.dropna()
 
-def getDescriptionandWeight(animalID, shelterID):
-    request = requests.post("https://24petconnect.com/PetHarbor/getAnimalDetails", headers={'Content-type': 'application/x-www-form-urlencoded'}, data="model%5BAnimalId%5D="+animalID+"&model%5BShelterId%5D="+shelterID)
+def getDescriptionandWeight(APALink):
+    request = requests.get(APALink)
     soup = bs(request.content.decode('utf-8'), 'html.parser')
-    info = soup.find_all("span", attrs={"class": "text_Description details"})[0].get_text()
-    weight = re.findall(r"Weight: [0-9]*?\.?[0-9]+? lbs", info)
-    return (soup.find_all("span", attrs={"class": "text_MoreInfo details"})[0].get_text(), weight)
+    info = soup.find_all("div", attrs={"class": "apa-side-group-item"})
+    print(info)
+    #weight = re.findall(r"Weight: [0-9]*?\.?[0-9]+? lbs", info)
+    #return (soup.find_all("span", attrs={"class": "text_MoreInfo details"})[0].get_text(), weight)
 
 #TODO: create separate method for data cleaning?
+#getDescriptionandWeight("https://apamo.org/adopt/adoptable-pets/?petID=A279214")
