@@ -23,8 +23,10 @@ def getDataFrame(index):
         dogsParsed = []
         for dog in resultGrid:
             dogHTML=bs(str(dog), 'html.parser')
+            imageURL = "https://24petconnect.com" + dogHTML('img')[0]['src']
             attrs = dogHTML('span')
             forDF = {"shelterCode": re.findall('APMO[0-9]?',str(dog.attrs['onclick']))[0]} #onclick = "Details('shelterCode', 'animal_id')"
+            forDF['imglink'] = imageURL
             for attr in attrs[:-1]:
                 prop, val = re.split(" ?: ",attr.string)
                 val = re.sub(" $", "", val)
