@@ -1,6 +1,6 @@
 from configparser import ConfigParser
 
-def load_config(filename='./config/requirements.ini', section='login'):
+def load_config(filename='./config/config.ini', section='login'):
     parser = ConfigParser()
     parser.read(filename)
     # get section
