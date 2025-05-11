@@ -43,7 +43,8 @@ def AzureGetSchemas():
             tempStorage=results.fetchall()
             totalStorage += tempStorage
         conn.close()
-    return totalStorage
+    final =  DataFrame(totalStorage, columns=["table", "name", "nullable", "type", "charLength"])
+    return final
 
 if __name__ == "__main__":
     print(AzureGetSchemas())
