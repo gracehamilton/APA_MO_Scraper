@@ -35,13 +35,15 @@ def AzureGetSchemas():
     config = getConnString()
     eng = create_engine("postgresql+psycopg2://"+config['user']+":"+config['password']+"@"+config['host']+":5432/"+config['database'], connect_args={'sslmode': "allow"})
     tables = AzureGetTables()
+    totalStorage = []
     with eng.connect().execution_options(isolation_level="AUTOCOMMIT", schema_translate_map={None:'public'}) as conn:
         for t in tables:
             tableName = t[0]
             results = conn.execute(text("SELECT table_name, column_name, is_nullable, data_type, character_maximum_length FROM information_schema.columns WHERE table_name = '"+tableName+"' ORDER BY ordinal_position;"))
-            conn.close()
             tempStorage=results.fetchall()
-            return DataFrame(tempStorage)
+            totalStorage += tempStorage
+        conn.close()
+    return totalStorage
 
 if __name__ == "__main__":
     print(AzureGetSchemas())
