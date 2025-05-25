@@ -46,5 +46,26 @@ def AzureGetSchemas():
     final =  DataFrame(totalStorage, columns=["table", "name", "nullable", "type", "charLength"])
     return final
 
+def AzureGetFunctions():
+    config = getConnString()
+    try:
+        eng = create_engine("postgresql+psycopg2://"+config['user']+":"+config['password']+"@"+config['host']+":5432/"+config['database'], connect_args={'sslmode': "allow"})
+        with eng.connect().execution_options(isolation_level="AUTOCOMMIT", schema_translate_map={None:'public'}) as conn:
+                results = conn.execute(text('\df '))
+    except Exception as err:
+        print("Error with function pull: " + err.args )
+
+def AzureGetAllWithStatus(status):
+    config = getConnString()
+    try:
+        eng = create_engine("postgresql+psycopg2://"+config['user']+":"+config['password']+"@"+config['host']+":5432/"+config['database'], connect_args={'sslmode': "allow"})
+        with eng.connect().execution_options(isolation_level="AUTOCOMMIT", schema_translate_map={None:'public'}) as conn:
+            results = conn.execute(text('SELECT d.*, s.* FROM dogs d LEFT JOIN stay s ON d."Animal_id" = s.animal_id WHERE d."Status" = \''+status+'\';'))
+            conn.close()
+        resultsdf = DataFrame(results.fetchall())
+        return resultsdf
+    except Exception as err:
+        print("Error with "+status+" records pull: " + err.args)
+
 if __name__ == "__main__":
-    print(AzureGetSchemas())
+    print(AzureGetAllWithStatus("Retired"))

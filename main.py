@@ -10,7 +10,6 @@ total = getTotal()
 today = dt.now().strftime(r'%Y%m%d_%H%M')
 reloads = math.ceil(total/30)
 totaldf = pd.DataFrame(columns= ["imglink", "Animal_id", "Name", "Gender", "Breed", "Animal_type", "Age", "Brought_to_the_shelter", "Located_at", "Distance", "shelterCode"])
-#TODO: pull weight, traits from actual APA website
 for i in range(reloads):
     totaldf = pd.concat([totaldf, getDataFrame(i * 30)], ignore_index=True)
 totaldf.drop("Animal_type", axis=1,inplace=True)
