@@ -31,10 +31,9 @@ def AzureGetTables():
         except Exception as err:
             print("Error with table pull: " + err.args)
 
-def AzureGetSchemas():
+def AzureGetSchemas(tables = AzureGetTables()):
     config = getConnString()
     eng = create_engine("postgresql+psycopg2://"+config['user']+":"+config['password']+"@"+config['host']+":5432/"+config['database'], connect_args={'sslmode': "allow"})
-    tables = AzureGetTables()
     totalStorage = []
     with eng.connect().execution_options(isolation_level="AUTOCOMMIT", schema_translate_map={None:'public'}) as conn:
         for t in tables:
@@ -51,7 +50,8 @@ def AzureGetFunctions():
     try:
         eng = create_engine("postgresql+psycopg2://"+config['user']+":"+config['password']+"@"+config['host']+":5432/"+config['database'], connect_args={'sslmode': "allow"})
         with eng.connect().execution_options(isolation_level="AUTOCOMMIT", schema_translate_map={None:'public'}) as conn:
-                results = conn.execute(text('\df '))
+                results = conn.execute(text("\df "))
+                return results
     except Exception as err:
         print("Error with function pull: " + err.args )
 
