@@ -6,18 +6,18 @@ from PetConnect import getTotal
 from sqlalchemy import create_engine, text
 import unittest, pytest
 
-class connectionTest(unittest.testCase):
-    def test_connection():
+class connectionTest(unittest.TestCase):
+    def test_connection(self):
         creds = getConnString()
         result = False
         try:
-            eng = create_engine("postgresql+psycopg2://"+creds['user']+":"+creds['password']+"@"+creds['host']+":5432/"+creds['database'], connect_arg={'sslmode': "allow"})
+            eng = create_engine("postgresql+psycopg2://"+creds['user']+":"+creds['password']+"@"+creds ['host']+":5432/"+creds['database'], connect_args={'sslmode': "allow"})
             conn = eng.connect()
             conn.close()
             result = True
         except Exception as err:
-            print(err)
-        assert result
+            result = False
+        assert result == True
 """    def test_activeCount():
         creds = getConnString()
         result = False
@@ -27,4 +27,4 @@ class connectionTest(unittest.testCase):
             conn.execute(text('SELECT COUNT("Animal_id") FROM dogs WHERE "Status" = \'Active\';'))
 """
 if __name__=="__main__":
-    print(connectionTest.test_connection())
+    unittest.main()
