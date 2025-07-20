@@ -1,12 +1,12 @@
 from sqlalchemy import engine, create_engine, text
 import sys, os
 sys.path.append(os.path.relpath("config"))
-from config import load_config # type: ignore
 from pandas import DataFrame
+from dotenv import dotenv_values
 #from socket import gethostname, gethostbyname
 
 def getConnString():
-    config = load_config(section='azure')
+    config = dotenv_values(".env")
     config['sslmode'] = 'require'
     return config
 
@@ -68,4 +68,4 @@ def AzureGetAllWithStatus(status):
         print("Error with "+status+" records pull: " + err.args)
 
 if __name__ == "__main__":
-    print(AzureGetAllWithStatus("Retired"))
+    print(dotenv_values(".env")['host'])
