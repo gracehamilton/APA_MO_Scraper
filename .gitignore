@@ -7,4 +7,5 @@
 /.env
 /pyvenv.cfg
 /output/
-/__pycache__/
+*/__pycache__/
+/.vscode/
