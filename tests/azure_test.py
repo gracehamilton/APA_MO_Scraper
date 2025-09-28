@@ -7,6 +7,9 @@ from PetConnect import getTotal
 import unittest
 
 class connectionTest(unittest.TestCase):
+    def test_credentials(self):
+        creds=getConnString()
+        self.assertIsNotNone(creds)
     def test_connection(self):
         creds = getConnString()
         result = False
